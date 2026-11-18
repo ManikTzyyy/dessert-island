@@ -1,9 +1,17 @@
-const Search = ()=>{
-    return (
-        <div className="px-2">
-            <input type="text" name="search" id="search" className="bg-white w-full px-4 py-2 rounded-full focus:outline-none" placeholder="Search your favorite dessert here!" />
-        </div>
-    )
-}
+const Search = ({ isScrolled }) => {
+  return (
+    <div className="px-2">
+      <input
+        type="text"
+        name="search"
+        id="search"
+        className={`bg-white  w-full px-4 py-2 rounded-full focus:outline-none
+                ${isScrolled && "border border-stone-400 transition-all duration-300"} 
+                `}
+        placeholder="Search your favorite dessert here!"
+      />
+    </div>
+  );
+};
 
-export {Search}
+export { Search };
