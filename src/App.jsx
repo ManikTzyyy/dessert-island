@@ -58,7 +58,14 @@ function App() {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             {products.map((e) => (
-              <ProductCard key={e.id} />
+              <ProductCard
+                key={e.id}
+                img={e.image}
+                name={e.name}
+                categories={e.category}
+                price={e.price}
+                desc={e.desc}
+              />
             ))}
           </div>
         )}
