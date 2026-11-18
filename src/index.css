@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+*::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+* {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* *{border: 1px solid yellow;} */
