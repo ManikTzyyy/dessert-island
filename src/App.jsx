@@ -2,7 +2,7 @@ import { ProductCard, CardLoading } from "./components/ProductCard";
 import { FloatingButton } from "./components/Button";
 import { Banner } from "./components/Banner";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useDebounce } from "./hooks/useDebounce";
 import { toast } from "sonner";
 import { SearchFilter } from "./Layouts/StickyNav";
@@ -12,6 +12,7 @@ function App() {
 
   const [products, setProducts] = useState([]);
   const [loadingProduct, setLoadingProduct] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   const [search, setSearch] = useState("");
 
@@ -19,12 +20,19 @@ function App() {
 
   const [category, setCategory] = useState("");
 
-  const fetchProduct = async () => {
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const observerRef = useRef(null);
+
+  const fetchProduct = async (pageNumber = 1) => {
     try {
       setLoadingProduct(true);
+      if (pageNumber > 1) {
+        setLoadingMore(true);
+      }
 
       const params = new URLSearchParams({
-        page: "1",
+        page: String(pageNumber),
         limit: "10",
         search: debouncedSearch,
         category: category,
@@ -39,16 +47,44 @@ function App() {
       }
 
       const data = await res.json();
-      setProducts(data.data ?? []);
+
+      const newProducts = data.data ?? [];
+
+      setProducts((prev) =>
+        pageNumber === 1 ? newProducts : [...prev, ...newProducts],
+      );
+      setHasMore(data.meta?.has_next ?? false);
+      setPage((data.meta?.current_page ?? pageNumber) + 1);
     } catch (error) {
       toast.error(error.message || "Terjadi kesalahan");
     } finally {
       setLoadingProduct(false);
+      setLoadingMore(false);
     }
   };
 
   useEffect(() => {
-    fetchProduct();
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && hasMore && !loadingProduct) {
+          fetchProduct(page);
+        }
+      },
+      { threshold: 0.5 },
+    );
+
+    if (observerRef.current) {
+      observer.observe(observerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [page, hasMore, loadingProduct]);
+
+  useEffect(() => {
+    setProducts([]);
+    setPage(1);
+    setHasMore(true);
+    fetchProduct(1);
   }, [debouncedSearch, category]);
 
   return (
@@ -62,7 +98,7 @@ function App() {
       />
       <div className="min-h-screen px-2 relative ">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-          {loadingProduct ? (
+          {loadingProduct && products.length === 0 ? (
             Array.from({ length: 8 }).map((_, i) => {
               return <CardLoading key={i} />;
             })
@@ -72,15 +108,27 @@ function App() {
             </div>
           ) : (
             products.map((e) => (
-              <ProductCard
-                key={e.id}
-                img={e.image}
-                name={e.name}
-                categories={e.category}
-                price={e.price}
-                desc={e.desc}
-              />
+              <div key={e.id}>
+                <ProductCard
+                  img={e.image}
+                  name={e.name}
+                  categories={e.category}
+                  price={e.price}
+                  desc={e.description}
+                />
+              </div>
             ))
+          )}
+          {loadingMore &&
+            Array.from({ length: 8 }).map((_, i) => (
+              <CardLoading key={`loading-more-${i}`} />
+            ))}
+          {!loadingProduct && hasMore && (
+            <div
+              ref={observerRef}
+              className="col-span-2 md:col-span-4 h-10"
+              aria-hidden="true"
+            />
           )}
         </div>
 

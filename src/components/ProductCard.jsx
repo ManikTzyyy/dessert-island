@@ -12,8 +12,8 @@ const ProductCard = ({
       <div className="w-full h-32  shrink-0 relative overflow-hidden">
         <img src={img} alt="" />
       </div>
-      <div className="flex flex-col justify-between px-1 py-2">
-        <div className="flex gap-2 text-stone-400">
+      <div className="flex flex-col justify-between gap-1 px-1 py-2 h-full">
+        <div className="flex gap-2 text-stone-400 overflow-x-scroll">
           {categories.map((e) => (
             <span className="border rounded-full px-2 text-sm" key={e}>
               {e}
@@ -25,10 +25,10 @@ const ProductCard = ({
         </span>
 
         <div className="flex flex-col pb-1">
-          <span className="text-lg md:text-xl text-orange-500 font-black">
+          <span className="text-lg md:text-xl text-orange-500 font-black truncate">
             {name}
           </span>
-          <span className="text-xs text-stone-400">{desc}</span>
+          <span className="text-xs text-stone-400 truncate">{desc}</span>
         </div>
 
         <Button />
