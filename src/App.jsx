@@ -17,6 +17,8 @@ function App() {
 
   const debouncedSearch = useDebounce(search, 500);
 
+  const [category, setCategory] = useState("");
+
   const fetchProduct = async () => {
     try {
       setLoadingProduct(true);
@@ -25,7 +27,7 @@ function App() {
         page: "1",
         limit: "500",
         search: debouncedSearch,
-        category: "",
+        category: category,
       });
 
       const res = await fetch(`${API_URL}/blenk/products?${params}`);
@@ -45,12 +47,17 @@ function App() {
 
   useEffect(() => {
     fetchProduct();
-  }, [debouncedSearch]);
+  }, [debouncedSearch, category]);
 
   return (
     <div className="space-y-2 bg-stone-100">
       <Banner />
-      <SearchFilter search={search} onSearch={setSearch} />
+      <SearchFilter
+        search={search}
+        onSearch={setSearch}
+        activeCategory={category}
+        onChangeCat={setCategory}
+      />
       <div className="min-h-screen px-2 relative ">
         {loadingProduct ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
