@@ -1,7 +1,9 @@
-const Search = ({ isScrolled }) => {
+const Search = ({ isScrolled, onSearch, search }) => {
   return (
     <div className="px-2">
       <input
+        value={search}
+        onChange={(e) => onSearch(e.target.value)}
         type="text"
         name="search"
         id="search"

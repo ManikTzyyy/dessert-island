@@ -1,10 +1,9 @@
 import { ProductCard, CardLoading } from "./components/ProductCard";
 import { FloatingButton } from "./components/Button";
 import { Banner } from "./components/Banner";
-import { Chip } from "./components/Chip";
-import { Search } from "./components/Search";
 
 import { useEffect, useState } from "react";
+import { useDebounce } from "./hooks/useDebounce";
 import { toast } from "sonner";
 import { SearchFilter } from "./Layouts/StickyNav";
 
@@ -14,13 +13,22 @@ function App() {
   const [products, setProducts] = useState([]);
   const [loadingProduct, setLoadingProduct] = useState(true);
 
+  const [search, setSearch] = useState("");
+
+  const debouncedSearch = useDebounce(search, 500);
+
   const fetchProduct = async () => {
     try {
       setLoadingProduct(true);
 
-      const res = await fetch(
-        `${API_URL}/blenk/products?page=1&limit=10&search=&category=`,
-      );
+      const params = new URLSearchParams({
+        page: "1",
+        limit: "500",
+        search: debouncedSearch,
+        category: "",
+      });
+
+      const res = await fetch(`${API_URL}/blenk/products?${params}`);
 
       if (!res.ok) {
         throw new Error(`Fetch gagal (${res.status})`);
@@ -37,12 +45,12 @@ function App() {
 
   useEffect(() => {
     fetchProduct();
-  }, []);
+  }, [debouncedSearch]);
 
   return (
     <div className="space-y-2 bg-stone-100">
       <Banner />
-      <SearchFilter />
+      <SearchFilter search={search} onSearch={setSearch} />
       <div className="min-h-screen px-2 relative ">
         {loadingProduct ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">

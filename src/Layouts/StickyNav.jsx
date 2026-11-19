@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Search } from "../components/Search";
 import { Chip } from "../components/Chip";
-const SearchFilter = () => {
+const SearchFilter = ({search, onSearch}) => {
   const [isSticky, setIsSticky] = useState(false);
 
   useEffect(() => {
@@ -22,7 +22,7 @@ const SearchFilter = () => {
         isSticky ? "bg-white " : "bg-transparent"
       }`}
     >
-      <Search isScrolled={isSticky} />
+      <Search isScrolled={isSticky} search={search} onSearch={onSearch} />
       <Chip isScrolled={isSticky} />
     </div>
   );
