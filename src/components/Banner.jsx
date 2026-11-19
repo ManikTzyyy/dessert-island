@@ -10,7 +10,7 @@ const Banner = () => {
         Dear Dessert
       </div>
       <div className="flex justify-between px-2 text-sm text-stone-700">
-        <p>+62 812 3456 7890</p>
+        <p>+62 813-3970-2828</p>
         <p>JL. Setiabudi no.128, Penarukan</p>
       </div>
     </div>

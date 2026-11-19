@@ -31,7 +31,7 @@ const ProductCard = ({
           <span className="text-xs text-stone-400 truncate">{desc}</span>
         </div>
 
-        <Button />
+        <Button menu={name} />
       </div>
     </div>
   );

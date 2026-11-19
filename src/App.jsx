@@ -7,6 +7,8 @@ import { useDebounce } from "./hooks/useDebounce";
 import { toast } from "sonner";
 import { SearchFilter } from "./Layouts/StickyNav";
 
+import { numberFormat } from "./utils/numberFormat";
+
 function App() {
   const API_URL = import.meta.env.VITE_BE_URL;
 
@@ -113,14 +115,14 @@ function App() {
                   img={e.image}
                   name={e.name}
                   categories={e.category}
-                  price={e.price}
+                  price={numberFormat(e.price)}
                   desc={e.description}
                 />
               </div>
             ))
           )}
           {loadingMore &&
-            Array.from({ length: 8 }).map((_, i) => (
+            Array.from({ length: 6 }).map((_, i) => (
               <CardLoading key={`loading-more-${i}`} />
             ))}
           {!loadingProduct && hasMore && (
