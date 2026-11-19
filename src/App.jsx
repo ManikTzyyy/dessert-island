@@ -25,12 +25,14 @@ function App() {
 
       const params = new URLSearchParams({
         page: "1",
-        limit: "500",
+        limit: "10",
         search: debouncedSearch,
         category: category,
       });
 
-      const res = await fetch(`${API_URL}/blenk/products?${params}`);
+      const res = await fetch(`${API_URL}/blenk/products?${params}`, {
+        cache: "no-store",
+      });
 
       if (!res.ok) {
         throw new Error(`Fetch gagal (${res.status})`);
@@ -59,20 +61,17 @@ function App() {
         onChangeCat={setCategory}
       />
       <div className="min-h-screen px-2 relative ">
-        {loadingProduct ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-            <CardLoading />
-            <CardLoading />
-            <CardLoading />
-            <CardLoading />
-          </div>
-        ) : products.length == 0 ? (
-          <div className=" flex justify-center items-center py-28">
-            No product yet
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-            {products.map((e) => (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+          {loadingProduct ? (
+            Array.from({ length: 8 }).map((_, i) => {
+              return <CardLoading key={i} />;
+            })
+          ) : products.length == 0 ? (
+            <div className=" flex justify-center items-center py-28 col-span-2">
+              No product yet
+            </div>
+          ) : (
+            products.map((e) => (
               <ProductCard
                 key={e.id}
                 img={e.image}
@@ -81,9 +80,9 @@ function App() {
                 price={e.price}
                 desc={e.desc}
               />
-            ))}
-          </div>
-        )}
+            ))
+          )}
+        </div>
 
         <div className="fixed bottom-2 z-50 right-2">
           <FloatingButton />
