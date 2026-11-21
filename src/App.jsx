@@ -1,4 +1,4 @@
-import { ProductCard, CardLoading } from "./components/ProductCard";
+import { ProductCard, CardLoading, CardDialog } from "./components/ProductCard";
 import { FloatingButton } from "./components/Button";
 import { Banner } from "./components/Banner";
 
@@ -27,6 +27,9 @@ function App() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const observerRef = useRef(null);
+
+  const [showProd, setShowProd] = useState(false);
+  const [selectedProd, setSelectedProd] = useState(null);
 
   const fetchProduct = async (pageNumber = 1) => {
     if (isFetchingRef.current) return;
@@ -106,6 +109,13 @@ function App() {
         activeCategory={category}
         onChangeCat={setCategory}
       />
+      <CardDialog
+        show={showProd}
+        onClose={() => {
+          setShowProd(false);
+        }}
+        data={selectedProd}
+      />
       <div className="min-h-screen px-2 relative ">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
           {loadingProduct && products.length === 0 ? (
@@ -118,7 +128,14 @@ function App() {
             </div>
           ) : (
             products.map((e) => (
-              <div key={e.id}>
+              <div
+                key={e.id}
+                role="button"
+                onClick={() => {
+                  setShowProd(true);
+                  setSelectedProd(e);
+                }}
+              >
                 <ProductCard
                   img={e.image}
                   name={e.name}
@@ -142,7 +159,7 @@ function App() {
           )}
         </div>
 
-        <div className="fixed bottom-2 z-50 right-2">
+        <div className="fixed bottom-2 z-20 right-2">
           <FloatingButton />
         </div>
       </div>
