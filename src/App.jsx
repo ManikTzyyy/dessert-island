@@ -20,6 +20,8 @@ function App() {
 
   const debouncedSearch = useDebounce(search, 500);
 
+  const isFetchingRef = useRef(false);
+
   const [category, setCategory] = useState("");
 
   const [page, setPage] = useState(1);
@@ -27,9 +29,13 @@ function App() {
   const observerRef = useRef(null);
 
   const fetchProduct = async (pageNumber = 1) => {
+    if (isFetchingRef.current) return;
+
+    isFetchingRef.current = true;
     try {
-      setLoadingProduct(true);
-      if (pageNumber > 1) {
+      if (pageNumber === 1) {
+        setLoadingProduct(true);
+      } else {
         setLoadingMore(true);
       }
 
@@ -60,27 +66,29 @@ function App() {
     } catch (error) {
       toast.error(error.message || "Terjadi kesalahan");
     } finally {
+      isFetchingRef.current = false;
       setLoadingProduct(false);
       setLoadingMore(false);
     }
   };
 
   useEffect(() => {
+    const target = observerRef.current;
+    if (!target) return;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && hasMore && !loadingProduct) {
+        if (entry.isIntersecting && hasMore && !isFetchingRef.current) {
           fetchProduct(page);
         }
       },
       { threshold: 0.5 },
     );
 
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
-    }
+    observer.observe(observerRef.current);
 
     return () => observer.disconnect();
-  }, [page, hasMore, loadingProduct]);
+  }, [page, hasMore]);
 
   useEffect(() => {
     setProducts([]);
@@ -125,7 +133,7 @@ function App() {
             Array.from({ length: 6 }).map((_, i) => (
               <CardLoading key={`loading-more-${i}`} />
             ))}
-          {!loadingProduct && hasMore && (
+          {hasMore && (
             <div
               ref={observerRef}
               className="col-span-2 md:col-span-4 h-10"
